@@ -30,7 +30,7 @@ class LoginForm extends Component {
 
   render() {
     return (
-      <div id="loginBox" className="row col-md-6">
+      <div id="loginBox" className="col-md-6">
         <div className="panel panel-default">
           <div className="panel-heading">
       ログイン

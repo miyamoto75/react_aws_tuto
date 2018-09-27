@@ -6,6 +6,7 @@ import Hello from './Hello';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ConfirmForm from './ConfirmForm';
+import TweetBox from './TweetBox';
 
 import AWS from "aws-sdk";
 import appConfig from './appConfig';
@@ -45,6 +46,8 @@ class App extends Component {
     this.bindFunc2 = this.confirmUser.bind(this);
 
     this.bindFunc3 = this.loginUser.bind(this);
+
+    this.bindFunc4 = this.submitTweet.bind(this);
   }
 
   sendUser = (email, pass) => {
@@ -138,20 +141,51 @@ console.log(AWS.config.credentials);
       },
 
     });
+  }
 
-    // var userData = {
-    //     Username : email,
-    //     Pool : userPool
+  submitTweet = (tweet) => {
+    // Make the call to obtain credentials
+    AWS.config.credentials.get(function(){
+
+      // Credentials will be available when this function is called.
+      var accessKeyId = AWS.config.credentials.accessKeyId;
+      var secretAccessKey = AWS.config.credentials.secretAccessKey;
+      var sessionToken = AWS.config.credentials.sessionToken;
+      // console.log(AWS.config.credentials.accessKeyId);
+
+    });
+
+    const identity = AWS.config.credentials.identityId;
+    console.log("identity id : " + AWS.config.credentials.identityId);
+    // console.log("ak " + accessKeyId);
+    // console.log("sec " + secretAccessKey);
+    // console.log("sess " + sessionToken);
+
+    // get dynamo client
+    // const dynamo = new AWS.DynamoDB({
+    //   accessKeyId:     accessKeyId,
+    //   secretAccessKey: secretAccessKey,
+    //   sessionToken:    sessionToken,
+    // });
+    // console.log(dynamo);
+
+    // // push to dynamo
+    // var params = {
+    //   Item: {
+    //     "user_id": {S: identity}, 
+    //     "created_at": {N: String(+new Date())}, 
+    //     "message": {S: tweet},
+    //   }, 
+    //   ReturnConsumedCapacity: "TOTAL", 
+    //   TableName: "spa_sample"
     // };
 
-    // var cognitoUser = new CognitoUser(userData);
-    // cognitoUser.confirmRegistration(code, true, function(err, result) {
+    // dynamo.putItem(params, (err, data) => {
     //   if (err) {
-    //     console.log(err);
-    //     return;
+    //     console.log(err, err.stack);
+    //   } else {
+    //     console.log(data);
     //   }
-    //   console.log('call result: ' + result);
-    //   alert(result);
     // });
   }
 
@@ -168,9 +202,11 @@ console.log(AWS.config.credentials);
       case "confirm":
         stageForm = <ConfirmForm confirmSignUp={this.bindFunc2} />;
         break;
-    
       case "login":
         stageForm = <LoginForm login={this.bindFunc3} />;
+        break;
+      case "tweet":
+        stageForm = <TweetBox post={this.bindFunc4} />;
         break;
     }
 
