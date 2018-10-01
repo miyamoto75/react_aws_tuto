@@ -48,6 +48,30 @@ class App extends Component {
     this.bindFunc3 = this.loginUser.bind(this);
 
     this.bindFunc4 = this.submitTweet.bind(this);
+
+
+    var comp = this;
+    var cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser != null) {
+      cognitoUser.getSession(function(err, session) {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return;
+        }
+        console.log('session validity: ' + session.isValid());
+
+        const idp_login = `cognito-idp.ap-northeast-1.amazonaws.com/${appConfig.UserPoolId}` 
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: appConfig.IdentityPoolId,
+          Logins : {
+            // Change the key below according to the specific region your user pool is in.
+            [idp_login]: session.getIdToken().getJwtToken()
+          }
+        });
+        comp.state = {errorMessage: "", stage: "tweet"};
+
+      });
+    }
   }
 
   sendUser = (email, pass) => {
@@ -152,34 +176,34 @@ const comp = this;
       var sessionToken = AWS.config.credentials.sessionToken;
       console.log(AWS.config.credentials.accessKeyId);
 
-    const identity = AWS.config.credentials.identityId;
-    console.log("identity id : " + AWS.config.credentials.identityId);
-    // get dynamo client
-    const dynamo = new AWS.DynamoDB({
-      accessKeyId:     accessKeyId,
-      secretAccessKey: secretAccessKey,
-      sessionToken:    sessionToken,
-    });
-    console.log(dynamo);
+      const identity = AWS.config.credentials.identityId;
+      console.log("identity id : " + AWS.config.credentials.identityId);
+      // get dynamo client
+      const dynamo = new AWS.DynamoDB({
+        accessKeyId:     accessKeyId,
+        secretAccessKey: secretAccessKey,
+        sessionToken:    sessionToken,
+      });
+      console.log(dynamo);
 
-    // push to dynamo
-    var params = {
-      Item: {
-        "user_id": {S: identity}, 
-        "created_at": {N: String(+new Date())}, 
-        "message": {S: tweet},
-      }, 
-      ReturnConsumedCapacity: "TOTAL", 
-      TableName: appConfig.TableName
-    };
+      // push to dynamo
+      var params = {
+        Item: {
+          "user_id": {S: identity}, 
+          "created_at": {N: String(+new Date())}, 
+          "message": {S: tweet},
+        }, 
+        ReturnConsumedCapacity: "TOTAL", 
+        TableName: appConfig.TableName
+      };
 
-    dynamo.putItem(params, (err, data) => {
-      if (err) {
-        console.log(err, err.stack);
-      } else {
-        console.log(data);
-      }
-    });
+      dynamo.putItem(params, (err, data) => {
+        if (err) {
+          console.log(err, err.stack);
+        } else {
+          console.log(data);
+        }
+      });
 
     });
 
@@ -189,8 +213,6 @@ const comp = this;
 
   }
 
-  changeStage = (stage) => {
-  }
 
   render() {
 
