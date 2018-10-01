@@ -119,16 +119,29 @@ class App extends Component {
             if (result) {
               console.log('You are now logged in.');
 
+
               // Add the User's Id Token to the Cognito credentials login map.
-              AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+              // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+              const idp = `cognito-idp.ap-northeast-1.amazonaws.com/${appConfig.UserPoolId}` 
+              const resp = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId: appConfig.IdentityPoolId,
                 Logins: {
-                  "cognito-idp.ap-northeast-1.amazonaws.com/ user pool id" : result.getIdToken().getJwtToken()
+                   : result.getIdToken().getJwtToken()
                 }
               });
-console.log(AWS.config.credentials);
-              comp.setState({stage: "tweet"});
+              console.log(resp);
 
+              // AWS.config.credentials.get(function(){
+
+              //   // Credentials will be available when this function is called.
+              //   var accessKeyId = AWS.config.credentials.accessKeyId;
+              //   var secretAccessKey = AWS.config.credentials.secretAccessKey;
+              //   var sessionToken = AWS.config.credentials.sessionToken;
+              //   console.log(AWS.config.credentials.accessKeyId);
+
+              // });
+
+              comp.setState({stage: "tweet"});
             }
           });
         }
@@ -177,7 +190,7 @@ console.log(AWS.config.credentials);
     //     "message": {S: tweet},
     //   }, 
     //   ReturnConsumedCapacity: "TOTAL", 
-    //   TableName: "spa_sample"
+    //   TableName: appConfig.TableName
     // };
 
     // dynamo.putItem(params, (err, data) => {
