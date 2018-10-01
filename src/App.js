@@ -109,45 +109,29 @@ const comp = this;
       onSuccess: function (result) {
         console.log(result);
         var accessToken = result.getAccessToken().getJwtToken();
+        const idp_login = `cognito-idp.ap-northeast-1.amazonaws.com/${appConfig.UserPoolId}` 
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId : appConfig.IdentityPoolId, // your identity pool id here
+          Logins : {
+            // Change the key below according to the specific region your user pool is in.
+            [idp_login]: result.getIdToken().getJwtToken()
+          }
+        });
 
-        /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer*/
-        var idToken = result.idToken.jwtToken;
-
-        var cognitoUser = userPool.getCurrentUser();
-
-        if (cognitoUser != null) {
-          cognitoUser.getSession(function(err, result) {
-            if (result) {
-              console.log('You are now logged in.');
-
-
-              // Add the User's Id Token to the Cognito credentials login map.
-              // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-              const idp = `cognito-idp.ap-northeast-1.amazonaws.com/${appConfig.UserPoolId}` 
-              const resp = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: appConfig.IdentityPoolId,
-                Logins: {
-                   : result.getIdToken().getJwtToken()
-                }
-              });
-              console.log(resp);
-
-              // AWS.config.credentials.get(function(){
-
-              //   // Credentials will be available when this function is called.
-              //   var accessKeyId = AWS.config.credentials.accessKeyId;
-              //   var secretAccessKey = AWS.config.credentials.secretAccessKey;
-              //   var sessionToken = AWS.config.credentials.sessionToken;
-              //   console.log(AWS.config.credentials.accessKeyId);
-
-              // });
-
-              comp.setState({stage: "tweet"});
-            }
-          });
-        }
+        //refreshes credentials using AWS.CognitoIdentity.getCredentialsForIdentity()
+        AWS.config.credentials.refresh((error) => {
+          if (error) {
+            console.error(error);
+          } else {
+            // Instantiate aws sdk service objects now that the credentials have been updated.
+            // example: var s3 = new AWS.S3();
+            console.log('Successfully logged!');
+            comp.setState({stage: "tweet"});
+          }
+        });
 
       },
+
 
       onFailure: function(err) {
         console.log(err);
@@ -158,6 +142,7 @@ const comp = this;
   }
 
   submitTweet = (tweet) => {
+    console.log(`tweet : ${tweet}`);
     // Make the call to obtain credentials
     AWS.config.credentials.get(function(){
 
@@ -165,42 +150,43 @@ const comp = this;
       var accessKeyId = AWS.config.credentials.accessKeyId;
       var secretAccessKey = AWS.config.credentials.secretAccessKey;
       var sessionToken = AWS.config.credentials.sessionToken;
-      // console.log(AWS.config.credentials.accessKeyId);
-
-    });
+      console.log(AWS.config.credentials.accessKeyId);
 
     const identity = AWS.config.credentials.identityId;
     console.log("identity id : " + AWS.config.credentials.identityId);
+    // get dynamo client
+    const dynamo = new AWS.DynamoDB({
+      accessKeyId:     accessKeyId,
+      secretAccessKey: secretAccessKey,
+      sessionToken:    sessionToken,
+    });
+    console.log(dynamo);
+
+    // push to dynamo
+    var params = {
+      Item: {
+        "user_id": {S: identity}, 
+        "created_at": {N: String(+new Date())}, 
+        "message": {S: tweet},
+      }, 
+      ReturnConsumedCapacity: "TOTAL", 
+      TableName: appConfig.TableName
+    };
+
+    dynamo.putItem(params, (err, data) => {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log(data);
+      }
+    });
+
+    });
+
     // console.log("ak " + accessKeyId);
     // console.log("sec " + secretAccessKey);
     // console.log("sess " + sessionToken);
 
-    // get dynamo client
-    // const dynamo = new AWS.DynamoDB({
-    //   accessKeyId:     accessKeyId,
-    //   secretAccessKey: secretAccessKey,
-    //   sessionToken:    sessionToken,
-    // });
-    // console.log(dynamo);
-
-    // // push to dynamo
-    // var params = {
-    //   Item: {
-    //     "user_id": {S: identity}, 
-    //     "created_at": {N: String(+new Date())}, 
-    //     "message": {S: tweet},
-    //   }, 
-    //   ReturnConsumedCapacity: "TOTAL", 
-    //   TableName: appConfig.TableName
-    // };
-
-    // dynamo.putItem(params, (err, data) => {
-    //   if (err) {
-    //     console.log(err, err.stack);
-    //   } else {
-    //     console.log(data);
-    //   }
-    // });
   }
 
   changeStage = (stage) => {
