@@ -3,5 +3,6 @@ const appConfig = {
   IdentityPoolId: 'ap-northeast-1:xxxxxxxxxxxxxxxxx',
   UserPoolId: 'ap-northeast-1_xxxxxxxxxx',
   ClientId: 'xxxxxxxxxxxxxx',
+  TableName: "******"
 };
 export default appConfig;
