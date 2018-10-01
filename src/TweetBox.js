@@ -33,7 +33,7 @@ class TweetBox extends Component {
             <form onSubmit={this.onSubmitHandle}>
               <div className="form-group">
                 <label htmlFor="exampleInputEmail1">tweet</label>
-                <textarea className="form-control" placeholder="なんでも" value={this.state.email} onChange={this.onEmailChange} />
+                <textarea className="form-control" placeholder="なんでも" value={this.state.email} onChange={this.onTweetChange} />
               </div>
               <button type="submit" className="btn btn-default ">つぶやく</button>
             </form>
