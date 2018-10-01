@@ -77,12 +77,13 @@ class App extends Component {
         Username : email,
         Pool : userPool
     };
+const comp = this;
 
     var cognitoUser = new CognitoUser(userData);
     cognitoUser.confirmRegistration(code, true, function(err, result) {
       if (err) {
         console.log(err);
-        this.setState({errorMessage: err.message});
+        comp.setState({errorMessage: err.message});
         return;
       }
       console.log('call result: ' + result);
