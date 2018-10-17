@@ -38,7 +38,6 @@ class App extends Component {
 
     this.state = {
       errorMessage: "",
-      stage: "register"
     }
 
 
@@ -71,7 +70,7 @@ class App extends Component {
             [idp_login]: session.getIdToken().getJwtToken()
           }
         });
-        comp.state = {errorMessage: "", stage: "tweet"};
+        comp.state = {errorMessage: ""};
 
       });
     }
@@ -153,7 +152,6 @@ const comp = this;
             // Instantiate aws sdk service objects now that the credentials have been updated.
             // example: var s3 = new AWS.S3();
             console.log('Successfully logged!');
-            comp.setState({stage: "tweet"});
           }
         });
 
