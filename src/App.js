@@ -217,6 +217,10 @@ const comp = this;
 
   render() {
 
+    const error_box = (this.state.errorMessage) ? 
+          <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>
+      : "";
+
     return (
       <React.Fragment>
         <div className="App">
@@ -230,7 +234,7 @@ const comp = this;
         </div>
 
         <div className="container">
-          <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>
+          {error_box}
           <Hello />
         </div>
 
@@ -240,14 +244,14 @@ const comp = this;
           <div className="container">
           
           <div className="row" style={{height: "400px"}}>
-            <Route exact path='/'      component={Home} />
+            <Route exact path='/'   component={Home} />
             <Route path='/register' component={() => <RegisterForm signUp={this.bindFunc}         />} />
             <Route path='/confirm'  component={() => <ConfirmForm  confirmSignUp={this.bindFunc2} />} />
             <Route path='/login'    component={() => <LoginForm    login={this.bindFunc3}         />} />
             <Route path='/tweet'    component={() => <TweetBox     post={this.bindFunc4}          />} />
           </div>
 
-            <hr />
+          <hr />
 
           <div className="row">
             <Link className="btn btn-primary" to='/register'>新規登録</Link>
