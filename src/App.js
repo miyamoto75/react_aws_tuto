@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Link } from 'react-router-dom'
+
 import logo from './logo.svg';
 import './App.css';
 
 import Hello from './Hello';
+import Home from './Home';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ConfirmForm from './ConfirmForm';
@@ -35,7 +38,6 @@ class App extends Component {
 
     this.state = {
       errorMessage: "",
-      stage: "register"
     }
 
 
@@ -68,7 +70,7 @@ class App extends Component {
             [idp_login]: session.getIdToken().getJwtToken()
           }
         });
-        comp.state = {errorMessage: "", stage: "tweet"};
+        comp.state = {errorMessage: ""};
 
       });
     }
@@ -150,7 +152,6 @@ const comp = this;
             // Instantiate aws sdk service objects now that the credentials have been updated.
             // example: var s3 = new AWS.S3();
             console.log('Successfully logged!');
-            comp.setState({stage: "tweet"});
           }
         });
 
@@ -216,21 +217,9 @@ const comp = this;
 
   render() {
 
-    var stageForm = "";
-    switch (this.state.stage) {
-      case "register":
-        stageForm = <RegisterForm signUp={this.bindFunc} />;
-        break;
-      case "confirm":
-        stageForm = <ConfirmForm confirmSignUp={this.bindFunc2} />;
-        break;
-      case "login":
-        stageForm = <LoginForm login={this.bindFunc3} />;
-        break;
-      case "tweet":
-        stageForm = <TweetBox post={this.bindFunc4} />;
-        break;
-    }
+    const error_box = (this.state.errorMessage) ? 
+          <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>
+      : "";
 
     return (
       <React.Fragment>
@@ -245,19 +234,35 @@ const comp = this;
         </div>
 
         <div className="container">
-          <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>
+          {error_box}
           <Hello />
-
-          <div className="row">
-            {stageForm}
-          </div>
-
-          <div className="row">
-          <button className="btn btn-default" onClick={() => this.setState({stage: "register"})}>新規登録</button>
-          <button className="btn btn-default" onClick={() => this.setState({stage: "confirm"})}>ユーザーを認証</button>
-          <button className="btn btn-default" onClick={() => this.setState({stage: "login"})}>ログイン</button>
-          </div>
         </div>
+
+        <hr />
+
+        <BrowserRouter>
+          <div className="container">
+          
+          <div className="row" style={{height: "400px"}}>
+            <Route exact path='/'   component={Home} />
+            <Route path='/register' component={() => <RegisterForm signUp={this.bindFunc}         />} />
+            <Route path='/confirm'  component={() => <ConfirmForm  confirmSignUp={this.bindFunc2} />} />
+            <Route path='/login'    component={() => <LoginForm    login={this.bindFunc3}         />} />
+            <Route path='/tweet'    component={() => <TweetBox     post={this.bindFunc4}          />} />
+          </div>
+
+          <hr />
+
+          <div className="row">
+            <Link className="btn btn-primary" to='/register'>新規登録</Link>
+            <Link className="btn btn-default" to='/confirm'>ユーザーを認証</Link>
+            <Link className="btn btn-success" to='/login'>ログイン</Link>
+            <Link className="btn btn-warning" to='/tweet'>つぶやく</Link>
+            <Link className="btn btn-link"    to='/'>Home</Link>
+          </div>
+
+          </div>
+        </BrowserRouter>
       </React.Fragment>
     );
   }
