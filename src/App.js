@@ -241,7 +241,7 @@ const comp = this;
         <BrowserRouter>
           <div className="container">
           
-          <div className="row">
+          <div className="row" style={{height: "400px"}}>
             <Route exact path='/'      component={Home} />
             <Route path='/login'       component={LoginForm} />
             <Route path='/register'    component={RegisterForm} />
