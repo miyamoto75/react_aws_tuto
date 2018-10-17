@@ -243,10 +243,10 @@ const comp = this;
           
           <div className="row" style={{height: "400px"}}>
             <Route exact path='/'      component={Home} />
-            <Route path='/login'       component={LoginForm} />
-            <Route path='/register'    component={RegisterForm} />
-            <Route path='/confirm'     component={ConfirmForm} />
-            <Route path='/tweet'       component={TweetBox} />
+            <Route path='/register' component={() => <RegisterForm signUp={this.bindFunc}         />} />
+            <Route path='/confirm'  component={() => <ConfirmForm  confirmSignUp={this.bindFunc2} />} />
+            <Route path='/login'    component={() => <LoginForm    login={this.bindFunc3}         />} />
+            <Route path='/tweet'    component={() => <TweetBox     post={this.bindFunc4}          />} />
           </div>
 
             <hr />
