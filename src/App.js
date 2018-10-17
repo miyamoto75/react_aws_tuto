@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Link } from 'react-router-dom'
+
 import logo from './logo.svg';
 import './App.css';
 
 import Hello from './Hello';
+import Home from './Home';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ConfirmForm from './ConfirmForm';
@@ -216,22 +219,6 @@ const comp = this;
 
   render() {
 
-    var stageForm = "";
-    switch (this.state.stage) {
-      case "register":
-        stageForm = <RegisterForm signUp={this.bindFunc} />;
-        break;
-      case "confirm":
-        stageForm = <ConfirmForm confirmSignUp={this.bindFunc2} />;
-        break;
-      case "login":
-        stageForm = <LoginForm login={this.bindFunc3} />;
-        break;
-      case "tweet":
-        stageForm = <TweetBox post={this.bindFunc4} />;
-        break;
-    }
-
     return (
       <React.Fragment>
         <div className="App">
@@ -247,17 +234,33 @@ const comp = this;
         <div className="container">
           <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>
           <Hello />
-
-          <div className="row">
-            {stageForm}
-          </div>
-
-          <div className="row">
-          <button className="btn btn-default" onClick={() => this.setState({stage: "register"})}>新規登録</button>
-          <button className="btn btn-default" onClick={() => this.setState({stage: "confirm"})}>ユーザーを認証</button>
-          <button className="btn btn-default" onClick={() => this.setState({stage: "login"})}>ログイン</button>
-          </div>
         </div>
+
+        <hr />
+
+        <BrowserRouter>
+          <div className="container">
+          
+          <div className="row">
+            <Route exact path='/'      component={Home} />
+            <Route path='/login'       component={LoginForm} />
+            <Route path='/register'    component={RegisterForm} />
+            <Route path='/confirm'     component={ConfirmForm} />
+            <Route path='/tweet'       component={TweetBox} />
+          </div>
+
+            <hr />
+
+          <div className="row">
+            <Link className="btn btn-primary" to='/register'>新規登録</Link>
+            <Link className="btn btn-default" to='/confirm'>ユーザーを認証</Link>
+            <Link className="btn btn-success" to='/login'>ログイン</Link>
+            <Link className="btn btn-warning" to='/tweet'>つぶやく</Link>
+            <Link className="btn btn-link"    to='/'>Home</Link>
+          </div>
+
+          </div>
+        </BrowserRouter>
       </React.Fragment>
     );
   }
